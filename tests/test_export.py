@@ -6,6 +6,28 @@ from frais import exporter_csv
 
 
 class ExporterCsvTest(unittest.TestCase):
+    def test_ajoute_une_ligne_total_apres_les_frais(self):
+        frais = [
+            {"libelle": "Train", "categorie": "transport", "montant_centimes": 4550},
+            {"libelle": "Déjeuner", "categorie": "repas", "montant_centimes": 1820},
+        ]
+
+        rows = list(csv.reader(io.StringIO(exporter_csv(frais)), delimiter=";"))
+
+        self.assertEqual(rows[-1], ["TOTAL", "", "63,70"])
+        self.assertEqual(rows[-2:], [
+            ["Déjeuner", "repas", "18,20"],
+            ["TOTAL", "", "63,70"],
+        ])
+
+    def test_export_sans_frais_ajoute_total_a_zero(self):
+        rows = list(csv.reader(io.StringIO(exporter_csv([])), delimiter=";"))
+
+        self.assertEqual(rows, [
+            ["libelle", "categorie", "montant_euros"],
+            ["TOTAL", "", "0,00"],
+        ])
+
     def test_exporte_les_frais_dans_l_ordre_attendu(self):
         frais = [
             {"libelle": "Train", "categorie": "transport", "montant_centimes": 4550},
@@ -16,7 +38,8 @@ class ExporterCsvTest(unittest.TestCase):
             exporter_csv(frais),
             "libelle;categorie;montant_euros\n"
             "Train;transport;45,50\n"
-            "Déjeuner;repas;18,20",
+            "Déjeuner;repas;18,20\n"
+            "TOTAL;;63,70",
         )
 
     def test_exporte_les_textes_avec_caracteres_csv_speciaux(self):

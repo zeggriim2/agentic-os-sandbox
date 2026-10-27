@@ -60,6 +60,7 @@ def exporter_csv(frais: list[Mapping[str, object]]) -> str:
     output = io.StringIO(newline="")
     writer = csv.writer(output, delimiter=";", lineterminator="\n")
     writer.writerow(("libelle", "categorie", "montant_euros"))
+    total_centimes = 0
 
     for item in frais:
         if not isinstance(item, Mapping):
@@ -84,6 +85,10 @@ def exporter_csv(frais: list[Mapping[str, object]]) -> str:
 
         euros, centimes = divmod(montant_centimes, 100)
         writer.writerow((libelle, categorie, f"{euros},{centimes:02d}"))
+        total_centimes += montant_centimes
+
+    euros, centimes = divmod(total_centimes, 100)
+    writer.writerow(("TOTAL", "", f"{euros},{centimes:02d}"))
 
     return output.getvalue().removesuffix("\n")
 
