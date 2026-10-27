@@ -41,7 +41,21 @@ from frais import Frais, total, total_par_categorie
 Les fonctions publiques observées sont :
 
 - `total(frais: list[Frais]) -> int` ;
-- `total_par_categorie(frais: list[Frais]) -> dict[str, int]`.
+- `total_par_categorie(frais: list[Frais]) -> dict[str, int]` ;
+- `exporter_csv(frais: list[Mapping[str, object]]) -> str` (avec l'alias historique `export_csv`).
+
+## Contrat d'entrée de `exporter_csv`
+
+`frais` doit être strictement une liste. Chaque élément doit être un mapping
+qui fournit les clés `libelle`, `categorie` et `montant_centimes`. `libelle` et
+`categorie` doivent être des chaînes ; le libellé ne peut pas être vide et la
+catégorie doit appartenir aux catégories autorisées. `montant_centimes` doit
+être un entier de centimes non négatif ; les booléens sont refusés.
+
+Un type incompatible (collection qui n'est pas une liste, élément qui n'est
+pas un mapping, ou champ dont le type est incorrect) provoque `TypeError`.
+Un frais incomplet ou une valeur invalide (texte vide, catégorie inconnue,
+montant négatif) provoque `ValueError`.
 
 ## Exceptions
 
@@ -60,4 +74,5 @@ Les tests unitaires sont dans `tests/test_notes.py`, sous forme de `unittest.Tes
 python3 -m unittest discover -s tests -v
 ```
 
-Aucune modification fonctionnelle, de code ou de configuration n'est introduite par cette inspection ; seul ce document de constat est ajouté.
+Le contrat ci-dessus est également détaillé dans la docstring de
+`frais.notes.exporter_csv` et couvert par `tests/test_export.py`.
